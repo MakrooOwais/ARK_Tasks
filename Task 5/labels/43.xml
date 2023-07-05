@@ -1,0 +1,26 @@
+<annotation>
+	<folder>images</folder>
+	<filename>43.png</filename>
+	<path>S:\ARK Task Round\Task 5\images\43.png</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>1820</width>
+		<height>780</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>Circle</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>1245</xmin>
+			<ymin>528</ymin>
+			<xmax>1490</xmax>
+			<ymax>772</ymax>
+		</bndbox>
+	</object>
+</annotation>
