@@ -1,6 +1,14 @@
 import pandas as pd
 
-drinks = {
+menu = """Please select an option!!
+'g': Get a drink.
+'REFILL': Restock.
+'s': Print the menu.
+'q': Quit!"""
+
+
+class VendingMachine:
+    drinks_dictioinary = {
     "Code": ["PEPS", "MDEW", "DPEP", "COKE", "GATO", "DCOK", "MINM", "TROP"],
     "Name": [
         "Pepsi",
@@ -15,84 +23,80 @@ drinks = {
     "Cost": [30, 30, 50, 20, 20, 30, 25, 30],
     "Stock": [0, 0, 0, 0, 0, 0, 0, 0],
 }
-
-menu = """Please select an option!!
-'g': Get a drink.
-'REFILL': Restock.
-'s': Print the menu.
-'q': Quit!"""
-
-
-class VendingMachine:
     def __init__(self) -> None:
-        self.drinks = pd.DataFrame(drinks)
-        self.max = 13
+        self.drinks = pd.DataFrame(VendingMachine.drinks_dictioinary)
+        self.refill()
+        self.max_name_length = 13
 
-    def restock(self, new_stock: int = 50) -> None:
+    def refill(self, new_stock: int = 50) -> None:
         self.drinks.Stock = new_stock
-        print("Restock Sucessful!!")
+        print("Refill Successful!!")
 
     def change_stock(self, code: str, new_stock: int) -> None:
         self.drinks.loc[self.drinks["Code"] == code, "Stock"] = new_stock
-        if new_stock == 0:
+        while new_stock == 0:
             print(
-                f"Stock of {self.drinks.loc[self.drinks['Code'] == code].values[0][1]} is EXHAUSTED!!"
+                f"Stock of {self.drinks.loc[self.drinks['Code'] == code, 'Name'].values[0]} is EXHAUSTED!!"
             )
+            break
 
     def get_cost(self, code: str) -> int:
-        return self.drinks.loc[self.drinks["Code"] == code].values[0][2]
+        return self.drinks.loc[self.drinks["Code"] == code, 'Cost'].values[0]
 
     def get_stock(self, code: str) -> int:
-        return self.drinks.loc[self.drinks["Code"] == code].values[0][3]
+        return self.drinks.loc[self.drinks["Code"] == code, 'Stock'].values[0]
 
     def __str__(self) -> str:
-        return_str: str = (
+        return_string: str = (
             "Code".ljust(6, " ")
-            + "Name".ljust(self.max + 3, " ")
+            + "Name".ljust(self.max_name_length + 3, " ")
             + "Cost".ljust(5, " ")
             + "\n"
         )
-        for index, drink in self.drinks.iterrows():
-            if drink["Stock"]:
-                return_str = (
-                    return_str
+        for _, drink in self.drinks.iterrows():
+            while drink["Stock"]:
+                return_string = (
+                    return_string
                     + drink["Code"].ljust(6, " ")
-                    + drink["Name"].ljust(self.max + 3, " ")
+                    + drink["Name"].ljust(self.max_name_length + 3, " ")
                     + str(drink["Cost"]).ljust(5, " ")
                     + "\n"
                 )
+                break
 
-        return return_str
+        return return_string
 
     def get_drink(self):
         while (
             code := input("Enter the code (NOT case sensitive.): ").upper()
-        ) not in drinks["Code"]:
-            print("Code not Found!! Please retry...")
+        ) not in VendingMachine.drinks_dictioinary["Code"]:
+            print("The entered key was not recognized!! Please try again...")
 
         current_stock: int = self.get_stock(code)
 
-        if current_stock:
+        while current_stock:
             cost: int = self.get_cost(code)
             while (amount := int(input("Enter the amount: "))) < cost:
                 print("Insufficicent funds!! Please try again...")
 
             self.change_stock(code, current_stock - 1)
-            pr_str = "Here is your Drink!!"
-            if amount - cost > 0:
+            pr_str = f"Here is your {self.drinks.loc[self.drinks['Code'] == code, 'Name'].values[0]}!!"
+            while amount - cost > 0:
                 pr_str = pr_str + f" And the change of {amount - cost}"
+                break
 
             print(pr_str)
-        else:
-            print("The requested drink is out of stock!! Please try again...")
-            self.get_drink()
+            return
+        
+        print("The requested drink is out of stock!! Please try again...")
+        self.get_drink()
 
 
 vm_1 = VendingMachine()
 
 menu_options: dict[str, callable] = {  # type: ignore
     "g": vm_1.get_drink,
-    "REFILL": vm_1.restock,
+    "REFILL": vm_1.refill,
     "q": quit,
     "s": lambda: print(vm_1),
 }

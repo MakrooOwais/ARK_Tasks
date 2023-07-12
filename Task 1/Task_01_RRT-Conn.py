@@ -2,6 +2,12 @@ import math
 import numpy as np
 from PIL import Image, ImageDraw
 
+def rgb2gray(rgb):
+    r, g, b = rgb[:,:,0], rgb[:,:,1], rgb[:,:,2]
+    gray = 0.2989 * r + 0.5870 * g + 0.1140 * b
+
+    return gray.astype(np.uint8)
+
 class Node:
     def __init__(self, n):
         self.x = int(n[0])
@@ -174,29 +180,44 @@ def reverse_coordinates(coor):
     return coor[1], coor[0]
 
 def main():
-    # try:
-        maze_easy = (np.array(Image.open("maze_easy_bin.png")))
-        # print(maze_easy)
+    maze_easy = rgb2gray(np.array(Image.open('Maze/maze_easy.png')))>0
 
-        x_start = (maze_easy.shape[0] - 1, int(maze_easy.shape[1] / 4))
-        x_goal = (maze_easy.shape[0] - 1, int(maze_easy.shape[1] * 3 / 4))
-        print(x_start)
-        print(x_goal)
+    x_start = (maze_easy.shape[0] - 1, int(maze_easy.shape[1] / 4))
+    x_goal = (maze_easy.shape[0] - 1, int(maze_easy.shape[1] * 3 / 4))
+    print(x_start)
+    print(x_goal)
 
-        rrt_conn = RrtConnect(x_start, x_goal, 6, 0.05, 5000, maze_easy)
-        path, num_itr = rrt_conn.planning()
+    rrt_conn = RrtConnect(x_start, x_goal, 6, 0.05, 5000, maze_easy)
+    path_easy, num_itr_easy = rrt_conn.planning()
 
-        print(path)
+    print(path_easy)
 
-        #map_img = Image.new("RGB", (maze_easy.shape[1], maze_easy.shape[0]))
-        map_img = Image.open('maze_easy.png')
-        draw = ImageDraw.Draw(map_img)
-        path_rev = [reverse_coordinates(x) for x in path]
-        draw.line(path_rev, fill='red')
-        map_img.save('maze_easy_sol.png')
-        print('Number of iterations: ', num_itr)
-    # except:
-    #     main()
+    map_img = Image.open('Maze/maze_easy.png')
+    draw = ImageDraw.Draw(map_img)
+    path_rev = [reverse_coordinates(x) for x in path_easy]
+    draw.line(path_rev, fill='red')
+    map_img.save('Maze/maze_easy_sol.png')
+    print('Number of iterations for the easy maze: ', num_itr_easy)
+
+
+    maze_hard = rgb2gray(np.array(Image.open('Maze/maze_hard.png')))>0
+
+    x_start = (0, int(maze_hard.shape[1] / 10))
+    x_goal = (int(maze_hard.shape[0] * 11 / 12), maze_hard.shape[1] - 1)
+    print(x_start)
+    print(x_goal)
+
+    rrt_conn = RrtConnect(x_start, x_goal, 6, 0.05, 5000, maze_hard)
+    path_hard, num_itr_hard = rrt_conn.planning()
+
+    print(path_hard)
+
+    map_img = Image.open('Maze/maze_hard.png')
+    draw = ImageDraw.Draw(map_img)
+    path_rev = [reverse_coordinates(x) for x in path_hard]
+    draw.line(path_rev, fill='red')
+    map_img.save('Maze/maze_hard_sol.png')
+    print('Number of iterations for the hard maze: ', num_itr_hard)
 
 if __name__ == "__main__":
     main()
